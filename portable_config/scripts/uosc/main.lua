@@ -1,6 +1,6 @@
 --[[
 SOURCE_ https://github.com/tomasklaen/uosc/tree/main/src/uosc
-COMMIT_ b77c1f95a877979bd5acef63bad84b03275a18af
+COMMIT_ 99510d50b89e3724b6115d9ef06731e97a50b7cf
 文档_ https://github.com/hooke007/mpv_PlayKit/discussions/186
 
 极简主义设计驱动的多功能界面脚本群组，兼容 thumbfast 新缩略图引擎
