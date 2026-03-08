@@ -1,15 +1,15 @@
 --[[
-SOURCE_ https://github.com/po5/thumbfast/blob/master/thumbfast.lua
-COMMIT_ 9deb0733c4e36938cf90e42ddfb7a19a8b2f4641
-文档_ thumbfast.conf
+SOURCE: https://github.com/po5/thumbfast/blob/master/thumbfast.lua
+COMMIT: 9deb0733c4e36938cf90e42ddfb7a19a8b2f4641
+Document: thumbfast.conf
 
-适配多个OSC类脚本的新缩略图引擎
+A new thumbnail engine compatible with multiple OSC-style scripts
 
-可用的快捷键示例（在 input.conf 中写入）：
+Example keybindings (add to input.conf):
 
- <KEY>   script-binding thumbfast/thumb_rerun    # 重启缩略图的获取（可用来手动修复缩略图卡死）
- <KEY>   script-binding thumbfast/thumb_toggle   # 开/关缩略图预览
- <KEY>   script-message thumb_hwdec toggle       # 开/关缩略图的硬解（可将其中的 {toggle} 参数换成指定的解码API）
+ <KEY>   script-binding thumbfast/thumb_rerun    # Restart thumbnail acquisition (manual fix for stuck thumbnails)
+ <KEY>   script-binding thumbfast/thumb_toggle   # Toggle thumbnail preview on/off
+ <KEY>   script-message thumb_hwdec toggle       # Toggle hardware decoding (replace {toggle} with a specific API)
 
 ]]
 
@@ -47,10 +47,10 @@ local options = {
 mp.options.read_options(options)
 
 if options.load == false then
-    mp.msg.info("脚本已被初始化禁用")
+    mp.msg.info("Script has been disabled during initialization")
     return
 end
--- 原因：--load-osd-console 重命名为 --load-console
+-- Reason: --load-osd-console renamed to --load-console
 local min_major = 0
 local min_minor = 40
 local min_patch = 0
@@ -80,7 +80,7 @@ local function incompat_check(full_str, tar_major, tar_minor, tar_patch)
     return false
 end
 if incompat_check(mpv_ver_curr, min_major, min_minor, min_patch) then
-    mp.msg.warn("当前mpv版本 (" .. (mpv_ver_curr or "未知") .. ") 低于 " .. min_major .. "." .. min_minor .. "." .. min_patch .. "，已终止缩略图功能。")
+    mp.msg.warn("Current mpv version (" .. (mpv_ver_curr or "unknown") .. ") is lower than " .. min_major .. "." .. min_minor .. "." .. min_patch .. ", thumbnail functionality terminated.")
     return
 end
 
@@ -426,7 +426,7 @@ local function spawn(time)
                 spawn_waiting = false
                 mp.msg.error("mpv subprocess create failed")
                 if not spawn_working then -- notify users of required configuration
-                    mp.commandv("show-text", "thumbfast 子进程创建失败！", 5)
+                    mp.commandv("show-text", "thumbfast: Subprocess creation failed!", 5)
                 end
             elseif success == true and result.status == 0 then
                 spawn_working = true
@@ -783,8 +783,8 @@ mp.add_key_binding(nil, "thumb_rerun", function()
     shutdown()
     auto_run = true
     file_load()
-    mp.osd_message("缩略图功能已重启", 2)
-    mp.msg.info("缩略图功能已重启")
+    mp.osd_message("Thumbnail functionality has been restarted", 2)
+    mp.msg.info("Thumbnail functionality has been restarted")
 end)
 mp.add_key_binding(nil, "thumb_toggle", function()
     if auto_run then
@@ -792,13 +792,13 @@ mp.add_key_binding(nil, "thumb_toggle", function()
         clear()
         shutdown()
         file_load()
-        mp.osd_message("缩略图功能已临时禁用", 2)
-        mp.msg.info("缩略图功能已临时禁用")
+        mp.osd_message("Thumbnail functionality has been temporarily disabled", 2)
+        mp.msg.info("Thumbnail functionality has been temporarily disabled")
     else
         auto_run = true
         file_load()
-        mp.osd_message("缩略图功能已临时启用", 2)
-        mp.msg.info("缩略图功能已临时启用")
+        mp.osd_message("Thumbnail functionality has been temporarily enabled", 2)
+        mp.msg.info("Thumbnail functionality has been temporarily enabled")
     end
 end)
 mp.register_script_message("thumb_hwdec", function(hwdec_api)
@@ -812,8 +812,8 @@ mp.register_script_message("thumb_hwdec", function(hwdec_api)
         end
     end
     options.hwdec = hwdec_api
-    mp.osd_message("缩略图已变更首选解码API：" .. hwdec_api, 2)
-    mp.msg.info("缩略图已变更首选解码API：" .. hwdec_api)
+    mp.osd_message("Thumbnails: Preferred decoding API changed to: " .. hwdec_api, 2)
+    mp.msg.info("Thumbnails: Preferred decoding API changed to: " .. hwdec_api)
     clear()
     shutdown()
     file_load()
