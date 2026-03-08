@@ -1,12 +1,12 @@
 --[[
 SOURCE_ https://github.com/tomasklaen/uosc/tree/main/src/uosc
-COMMIT_ 99510d50b89e3724b6115d9ef06731e97a50b7cf
-文档_ https://github.com/hooke007/mpv_PlayKit/discussions/186
+COMMIT_ b77c1f95a877979bd5acef63bad84b03275a18af
+DOC_ https://github.com/hooke007/mpv_PlayKit/discussions/186
 
-极简主义设计驱动的多功能界面脚本群组，兼容 thumbfast 新缩略图引擎
+Minimalist design-driven multifunction UI script set, compatible with the new thumbfast thumbnail engine
 ]]
 
-local uosc_version = '5.12.1'
+local uosc_version = '5.12.0'
 
 mp.commandv('script-message', 'uosc-version', uosc_version)
 
@@ -135,7 +135,7 @@ if not itable_index_of({'left', 'right'}, options.top_bar_controls) then
 	options.top_bar_controls = options.top_bar_controls == 'yes' and 'right' or nil
 end
 
--- 用于UI倍率计算
+-- Used for UI scale calculation
 function auto_ui_scale()
 	local display_w, display_h = mp.get_property_number('display-width', 0), mp.get_property_number('display-height', 0)
 	local display_aspect = display_w / display_h or 0
@@ -147,7 +147,7 @@ function auto_ui_scale()
 	end
 	return factor
 end
--- 设置脚本属性
+-- Set script properties
 mp.set_property_native('user-data/osc', { idlescreen = options.idlescreen })
 
 --[[ Language ]]
@@ -327,7 +327,7 @@ function update_config()
 end
 update_config()
 
--- 上下文菜单的默认内容
+-- Default context menu contents
 function create_default_menu_items()
 	return {
 		{title = ulang._cm_load, items = {
@@ -468,7 +468,7 @@ function update_display_dimensions()
 	local real_width, real_height = mp.get_osd_size()
 	if real_width <= 0 then return end
 
-	-- 此处起才能获取到显示分辨率的信息
+	-- Display resolution info becomes available from here
 	local dpi, scale_fom = state.hidpi_scale, options.scale_fullscreen
 	if scale_fom <= 0 then scale_fom = 1 end
 	if options.scale < 0 then
@@ -883,7 +883,7 @@ bind_command('subtitles', create_select_tracklist_type_menu_opener({
 	load_command = 'script-binding uosc/load-subtitles',
 	download_command = 'script-binding uosc/download-subtitles',
 }))
---bind_command('subtitles', create_select_tracklist_type_menu_opener({ -- 旧版次字幕菜单
+--bind_command('subtitles', create_select_tracklist_type_menu_opener({ -- Old secondary subtitle menu
 --	title = ulang._sid_sec_submenu_title,
 --	type = 'sub',
 --	prop = 'secondary-sid',
@@ -990,7 +990,7 @@ bind_command('stream-quality', open_stream_quality_menu)
 bind_command('open-file', open_open_file_menu)
 bind_command('shuffle', function()
 	set_state('shuffle', not state.shuffle)
---	mp.osd_message(state.shuffle and t('Shuffle ON') or t('Shuffle OFF')) -- 没必要提示
+--	mp.osd_message(state.shuffle and t('Shuffle ON') or t('Shuffle OFF')) -- No need to show a prompt
 end)
 bind_command('items', function()
 	if state.has_playlist then
@@ -1114,7 +1114,7 @@ bind_command('update', function()
 	if not Elements:has('updater') then require('elements/Updater'):new() end
 end)
 
--- 空闲自动弹出上下文菜单
+-- Auto-show context menu when idle
 if type(options.idle_call_menu) == 'number' then
 	if options.idle_call_menu <= 2 and options.idle_call_menu > config.render_delay then
 		mp.observe_property('idle-active', 'bool', function(_, value)
@@ -1200,7 +1200,7 @@ if options.idlescreen then
 		mp.set_property_native('user-data/osc', { idlescreen = state.idlescreen })
 
 		if not no_osd and mp.get_property_number('osd-level', 1) >= 1 then
-			mp.osd_message('LOGO的可见性：' .. tostring(mode))
+			mp.osd_message('LOGO visibility: ' .. tostring(mode))
 		end
 	end)
 end
