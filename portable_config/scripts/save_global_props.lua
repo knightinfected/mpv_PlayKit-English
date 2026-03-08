@@ -1,12 +1,14 @@
 --[[
 
-文档_ save_global_props.conf
+Document: save_global_props.conf
 
-记录全局的属性变化，支持在下次程序启动时恢复，其对应数据保存在对应文件 saved-props.json
-（选项 --save-position-on-quit 保存的是基于具体文件的属性，不要与 --watch-later-options 保存的属性相冲突）
+Records global property changes and supports restoration upon the next program start. 
+The data is saved in the file: saved-props.json
+(Note: The --save-position-on-quit option saves properties based on specific files; 
+do not conflict these with properties saved via --watch-later-options)
 
-可用的快捷键示例（在 input.conf 中写入）：
- <KEY>   script-message-to save_global_props clean_data   # 清除已记录的数据
+Example keybinding (add to input.conf):
+ <KEY>   script-message-to save_global_props clean_data   # Clear recorded data
 
 ]]
 
@@ -25,10 +27,10 @@ local opt = {
 mp.options.read_options(opt)
 
 if opt.load == false then
-	mp.msg.info("脚本已被初始化禁用")
+	mp.msg.info("Script has been disabled during initialization")
 	return
 end
--- 原因：首个添加 --watch-later-options 选项的版本
+-- Reason: First version to add --watch-later-options
 local min_major = 0
 local min_minor = 34
 local min_patch = 0
@@ -58,7 +60,7 @@ local function incompat_check(full_str, tar_major, tar_minor, tar_patch)
 	return false
 end
 if incompat_check(mpv_ver_curr, min_major, min_minor, min_patch) then
-	mp.msg.warn("当前mpv版本 (" .. (mpv_ver_curr or "未知") .. ") 低于 " .. min_major .. "." .. min_minor .. "." .. min_patch .. "，已终止脚本。")
+	mp.msg.warn("Current mpv version (" .. (mpv_ver_curr or "unknown") .. ") is lower than " .. min_major .. "." .. min_minor .. "." .. min_patch .. ", script terminated.")
 	return
 end
 
@@ -79,7 +81,7 @@ local function check_dup(table1, table2)
 		for _, value2 in ipairs(table2) do
 			if value1 == value2 then
 				dup_opts = true
-				mp.msg.warn("存在与 --watch-later-options 重合的项目： " .. value1)
+				mp.msg.warn("Conflict found: Item overlaps with --watch-later-options: " .. value1)
 			end
 		end
 	end
@@ -88,7 +90,7 @@ end
 check_dup(opt.props, watch_later_opts)
 
 if dup_opts and opt.dup_block then
-	mp.msg.warn("已自动禁用 全局属性保存恢复")
+	mp.msg.warn("Automatically disabled Global Property Save/Restore")
 	return
 end
 
@@ -109,7 +111,7 @@ local saved_data = read_data_file()
 
 local function save_data_file()
 	if cleaned then
-		mp.msg.verbose("因清理属性记录而中止保存功能")
+		mp.msg.verbose("Aborted saving because property records are being cleared")
 		return
 	end
 	local file = io.open(data_file_path, "w+")
@@ -132,8 +134,8 @@ local function clean_data_file()
 	file:write(content)
 	file:close()
 	cleaned = true
-	mp.msg.info("全局属性保存恢复 已清理缓存")
-	mp.osd_message("已清理记录的属性\n建议重启mpv", 2)
+	mp.msg.info("Global Property Save/Restore: Cache cleared")
+	mp.osd_message("Recorded properties cleared\nRestarting mpv is recommended", 2)
 end
 
 local function init()
@@ -152,7 +154,7 @@ local function init()
 end
 
 init()
-mp.msg.info("正在运行 全局属性保存恢复 模式" .. opt.save_mode)
+mp.msg.info("Running Global Property Save/Restore Mode " .. opt.save_mode)
 
 if opt.save_mode == 1 then
 	mp.register_event("shutdown", function()
