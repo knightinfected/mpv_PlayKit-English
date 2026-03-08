@@ -1,7 +1,7 @@
 --[[
-文档_ https://github.com/hooke007/mpv_PlayKit/discussions/615
+DOC_ https://github.com/hooke007/mpv_PlayKit/discussions/615
 
-快捷指令增强
+Enhanced shortcuts
 ]]
 
 local mp = require "mp"
@@ -14,10 +14,10 @@ local user_opt = {
 mp.options.read_options(user_opt)
 
 if user_opt.load == false then
-	mp.msg.info("脚本已被初始化禁用")
+	mp.msg.info("Script disabled by initialization setting")
 	return
 end
--- 原因：stats 新增了第五页
+-- Reason: stats added a fifth page
 local min_major = 0
 local min_minor = 39
 local min_patch = 0
@@ -47,7 +47,7 @@ local function incompat_check(full_str, tar_major, tar_minor, tar_patch)
 	return false
 end
 if incompat_check(mpv_ver_curr, min_major, min_minor, min_patch) then
-	mp.msg.warn("当前mpv版本 (" .. (mpv_ver_curr or "未知") .. ") 低于 " .. min_major .. "." .. min_minor .. "." .. min_patch .. "，已终止脚本。")
+	mp.msg.warn("Current mpv version (" .. (mpv_ver_curr or "unknown") .. ") is below " .. min_major .. "." .. min_minor .. "." .. min_patch .. " is below required version; script terminated.")
 	return
 end
 
@@ -123,7 +123,8 @@ local show_page = 0
 function adevicelist_pre(start)
 	mp.set_property("audio-device", adevicelist[start].name)
 	adevicelist[start].description = "■ " .. adevicelist[start].description
-	local adevice_content = tostring("音频输出设备：\n")
+	local adevice_content = tostring("Audio output device:
+\n")
 	for items = 1, #adevicelist do
 		if string.find(adevicelist[items].name, target_ao, 1, true) then
 			if adevicelist[items].name ~= adevicelist[start].name then
@@ -170,7 +171,7 @@ function chap_skip_check(_, value)
 	for _, words in pairs(chap_keywords) do
 		if string.match(value, words) and chap_skip then
 			mp.commandv("add", "chapter", 1)
-			mp.msg.info("chap_skip_check 跳过章节")
+			mp.msg.info("chap_skip_check Skip chapter")
 		end
 	end
 end
@@ -178,12 +179,12 @@ function chap_skip_toggle()
 	if chap_skip then
 		mp.unobserve_property(chap_skip_check)
 		chap_skip = false
-		mp.osd_message("[input_plus] " .. "已禁用跳过片头片尾", 1)
+		mp.osd_message("[input_plus] " .. "Skip OP/ED disabled", 1)
 		return
 	end
 	mp.observe_property("chapter-metadata/TITLE", "string", chap_skip_check)
 	chap_skip = true
-	mp.osd_message("[input_plus] " .. "已启用跳过片头片尾", 1)
+	mp.osd_message("[input_plus] " .. "Skip OP/ED enabled", 1)
 end
 
 function chapter_seek_force(step, nat, uosc)
@@ -334,7 +335,7 @@ local import_configs = {
 			Add-Type -AssemblyName Microsoft.VisualBasic
 			$u8 = [System.Text.Encoding]::UTF8
 			$out = [Console]::OpenStandardOutput()
-			$urlname = [Microsoft.VisualBasic.Interaction]::InputBox("输入地址", "打开", "https://")
+			$urlname = [Microsoft.VisualBasic.Interaction]::InputBox("Enter URL", "Open", "https://")
 			$u8urlname = $u8.GetBytes("$urlname")
 			$out.Write($u8urlname, 0, $u8urlname.Length)
 		}]],
@@ -378,27 +379,27 @@ function info_get()
 	local fps_o, fps_t = string.format("%0.3f", mp.get_property_number("container-fps", 0)), string.format("%0.3f", mp.get_property_number("estimated-vf-fps", 0))
 	local bitrateV, bitrateA = mp.get_property_number("video-bitrate", 0) / 1000, mp.get_property_number("audio-bitrate", 0) / 1000
 	local txt = (
-	style_generic.."设置目录： ".."{\\fs18\\1c&H0099FF}"..conf_dir:gsub("\\", "/").."\n"..
-	style_generic.."输出尺寸： ".."{\\1c&H0099FF}".."["..w_s.."] x ["..h_s.."]".."\n"..
-	style_generic.."解码模式： ".."{\\1c&H0099FF}"..mp.get_property_native("hwdec-current", "...").."\n"..
-	style_generic.."显示同步： ".."{\\1c&H0099FF}"..mp.get_property_native("video-sync", "...").."\n"..
-	style_generic.."丢帧暂计： ".."{\\1c&H0099FF}"..mp.get_property_number("frame-drop-count", 0).."\n"..
-	style_generic.."当前文件： ".."{\\fs18\\1c&H0099FF}"..cur_name:gsub("\\n", " "):gsub("\\$", ""):gsub("{","\\{").."\n"..
-	style_generic.."视频 ┓".."\n"..
-	style_generic.."-   输出： ".."{\\1c&H03A89E}"..mp.get_property_native("current-vo", "...").."\n"..
-	style_generic.."-   编码： ".."{\\1c&H03A89E}"..mp.get_property_native("video-codec", "...").."\n"..
-	style_generic.."-   尺寸： ".."{\\1c&H03A89E}".."["..w_raw.."] x ["..h_raw.."]".."\n"..
-	style_generic.."-   像素： ".."{\\1c&H03A89E}"..pix_fmt.."\n"..
-	style_generic.."-   动态： ".."{\\1c&H03A89E}"..color_lv.."\n"..
-	style_generic.."-   帧率： ".."{\\1c&H03A89E}"..fps_o.." FPS（原始） "..fps_t.." FPS（目标）".."\n"..
-	style_generic.."-   码率： ".."{\\1c&H03A89E}"..bitrateV.." kbps（当前）".."\n"..
-	style_generic.."音频 ┓".."\n"..
-	style_generic.."-   输出： ".."{\\1c&H9EA803}"..mp.get_property_native("current-ao", "...").."【设备】"..mp.get_property_native("audio-device", "...").."\n"..
-	style_generic.."-   编码： ".."{\\1c&H9EA803}"..mp.get_property_native("audio-codec", "...").."\n"..
-	style_generic.."-   码率： ".."{\\1c&H9EA803}"..bitrateA.." kbps（当前）".."\n"..
-	style_generic.."着色器列： ".."{\\fs18\\1c&HFF8821}"..mp.get_property_osd("glsl-shaders"):gsub(":\\", "/"):gsub(":/", "/"):gsub("\\", "/"):gsub(";", " "):gsub(",", " "):gsub(":", " ").."\n"..
-	style_generic.."视频滤镜： ".."{\\fs18\\1c&HFF8821}"..mp.get_property_osd("vf"):gsub("%(empty%)", ""):gsub(" %[", "%["):gsub("%]\n", "%] "):gsub(" %(disabled%)", "（禁用）").."\n"..
-	style_generic.."音频滤镜： ".."{\\fs18\\1c&HFF8821}"..mp.get_property_osd("af"):gsub("%(empty%)", ""):gsub(" %[", "%["):gsub("%]\n", "%] "):gsub(" %(disabled%)", "（禁用）")
+	style_generic.."Config directory: ".."{\\fs18\\1c&H0099FF}"..conf_dir:gsub("\\", "/").."\n"..
+	style_generic.."Output size:  ".."{\\1c&H0099FF}".."["..w_s.."] x ["..h_s.."]".."\n"..
+	style_generic.."Decode mode:  ".."{\\1c&H0099FF}"..mp.get_property_native("hwdec-current", "...").."\n"..
+	style_generic.."Display sync:  ".."{\\1c&H0099FF}"..mp.get_property_native("video-sync", "...").."\n"..
+	style_generic.."Dropped frames:  ".."{\\1c&H0099FF}"..mp.get_property_number("frame-drop-count", 0).."\n"..
+	style_generic.."Current file:  ".."{\\fs18\\1c&H0099FF}"..cur_name:gsub("\\n", " "):gsub("\\$", ""):gsub("{","\\{").."\n"..
+	style_generic.."Video ┓".."\n"..
+	style_generic.."-   Output: ".."{\\1c&H03A89E}"..mp.get_property_native("current-vo", "...").."\n"..
+	style_generic.."-   Codec:  ".."{\\1c&H03A89E}"..mp.get_property_native("video-codec", "...").."\n"..
+	style_generic.."-   Size:  ".."{\\1c&H03A89E}".."["..w_raw.."] x ["..h_raw.."]".."\n"..
+	style_generic.."-   Pixel format:  ".."{\\1c&H03A89E}"..pix_fmt.."\n"..
+	style_generic.."-   Range:  ".."{\\1c&H03A89E}"..color_lv.."\n"..
+	style_generic.."-   FPS:  ".."{\\1c&H03A89E}"..fps_o.." FPS (source) "..fps_t.." FPS (target)".."\n"..
+	style_generic.."-   Bitrate:  ".."{\\1c&H03A89E}"..bitrateV.." kbps (current)".."\n"..
+	style_generic.."Audio ┓".."\n"..
+	style_generic.."-   Output: ".."{\\1c&H9EA803}"..mp.get_property_native("current-ao", "...").." [Device] "..mp.get_property_native("audio-device", "...").."\n"..
+	style_generic.."-   Codec:  ".."{\\1c&H9EA803}"..mp.get_property_native("audio-codec", "...").."\n"..
+	style_generic.."-   Bitrate:  ".."{\\1c&H9EA803}"..bitrateA.." kbps (current)".."\n"..
+	style_generic.."Shader chain:  ".."{\\fs18\\1c&HFF8821}"..mp.get_property_osd("glsl-shaders"):gsub(":\\", "/"):gsub(":/", "/"):gsub("\\", "/"):gsub(";", " "):gsub(",", " "):gsub(":", " ").."\n"..
+	style_generic.."Video filters:  ".."{\\fs18\\1c&HFF8821}"..mp.get_property_osd("vf"):gsub("%(empty%)", ""):gsub(" %[", "%["):gsub("%]\n", "%] "):gsub(" %(disabled%)", "(disabled)").."\n"..
+	style_generic.."Audio filters:  ".."{\\fs18\\1c&HFF8821}"..mp.get_property_osd("af"):gsub("%(empty%)", ""):gsub(" %[", "%["):gsub("%]\n", "%] "):gsub(" %(disabled%)", "(disabled)")
 	)
 	return tostring(txt)
 end
@@ -427,7 +428,7 @@ function mark_aid_reset()
 	mp.command("no-osd set lavfi-complex \"\"")
 	merged_aid = false
 	marked_aid_A, marked_aid_B = nil, nil
-	mp.osd_message("[input_plus] " .. "已取消并轨和标记", 1)
+	mp.osd_message("[input_plus] " .. "Track merge and marks cleared", 1)
 	if mark_aid_reg then
 		mp.unregister_event(mark_aid_check)
 		mark_aid_reg = false
@@ -437,16 +438,16 @@ function mark_aid_check()
 	if marked_aid_A ~= nil or marked_aid_B ~= nil then
 		mark_aid_reset()
 	end
-	mp.msg.info("mark_aid_check 重置并轨和标记", 1)
+	mp.msg.info("mark_aid_check Reset track merge and marks", 1)
 end
 function mark_aid_A()
 	marked_aid_A = mp.get_property_number("aid", 0)
 	if marked_aid_A == 0
 	then
-		mp.osd_message("[input_plus] " .. "当前音轨无效", 1)
+		mp.osd_message("[input_plus] " .. "Current audio track is invalid", 1)
 		marked_aid_A = nil
 	else
-		mp.osd_message("[input_plus] " .. "预标记当前音轨序列 " .. marked_aid_A .. " 为并行轨A", 1)
+		mp.osd_message("[input_plus] " .. "Pre-mark current audio track " .. marked_aid_A .. " as parallel track A", 1)
 	end
 	if mark_aid_reg then
 		return
@@ -459,10 +460,10 @@ function mark_aid_B()
 	marked_aid_B = mp.get_property_number("aid", 0)
 	if marked_aid_B == 0
 	then
-		mp.osd_message("[input_plus] " .. "当前音轨无效", 1)
+		mp.osd_message("[input_plus] " .. "Current audio track is invalid", 1)
 		marked_aid_B = nil
 	else
-		mp.osd_message("[input_plus] " .. "预标记当前音轨序列 " .. marked_aid_B .. " 为并行轨B", 1)
+		mp.osd_message("[input_plus] " .. "Pre-mark current audio track " .. marked_aid_B .. " as parallel track B", 1)
 	end
 	if mark_aid_reg then
 		return
@@ -474,11 +475,11 @@ end
 function mark_aid_merge()
 	if marked_aid_A == marked_aid_B or marked_aid_A == nil or marked_aid_B == nil
 	then
-		mp.osd_message("[input_plus] " .. "无效的AB音轨", 1)
+		mp.osd_message("[input_plus] " .. "Invalid A/B audio tracks", 1)
 		marked_aid_A, marked_aid_B = nil, nil
 	else
 		mp.command("set lavfi-complex \"[aid" .. marked_aid_A .. "] [aid" .. marked_aid_B .. "] amix [ao]\"")
-		mp.osd_message("[input_plus] " .. "已合并AB音轨", 1)
+		mp.osd_message("[input_plus] " .. "Merged A/B audio tracks", 1)
 		merged_aid = true
 	end
 end
@@ -549,27 +550,27 @@ function osd_hack_set(num, freq)
 		elseif num == 1 then
 			osd_hack_freq = freq
 			osd_hack_timer = mp.add_periodic_timer(osd_hack_freq, update_osd)
-			mp.msg.info("update_osd 已启动")
+			mp.msg.info("update_osd started")
 		end
 	else
 		if freq == osd_hack_freq then
 			if num == 0 then
 				osd_hack_timer:stop()
-				mp.msg.info("update_osd 已暂停")
+				mp.msg.info("update_osd paused")
 			elseif num == 1 then
 				osd_hack_timer:resume()
-				mp.msg.info("update_osd 已恢复")
+				mp.msg.info("update_osd resumed")
 			end
 		else
 			osd_hack_freq = freq
 			osd_hack_timer:kill()
 			osd_hack_timer = nil
 			if num == 0 then
-				mp.msg.info("update_osd 已终止")
+				mp.msg.info("update_osd stopped")
 				return
 			elseif num == 1 then
 				osd_hack_timer = mp.add_periodic_timer(osd_hack_freq, update_osd)
-				mp.msg.info("update_osd 已重启")
+				mp.msg.info("update_osd restarted")
 			end
 		end
 	end
@@ -582,7 +583,7 @@ function scale_recal(pct)
 	local scale_win = mp.get_property_number("current-window-scale", 0)
 	local scale_shift = mp.get_property_number("display-hidpi-scale", 1)
 	if w_dp == 0 or w_vf == 0 or scale_win == 0 then
-		mp.msg.warn("scale_recal 缺乏必要条件")
+		mp.msg.warn("scale_recal required conditions are missing")
 		scale_target = 0
 		return
 	end
@@ -602,7 +603,7 @@ function window_mini(alt1, alt2)
 end
 function pip_dummy(pct)
 	if mp.get_property_native("idle-active") or not mp.get_property_native("vid") then
-		mp.msg.warn("pip_dummy 无法在当前状态使用")
+		mp.msg.warn("pip_dummy cannot be used in the current state")
 		return
 	end
 	scale_recal(pct)
@@ -610,7 +611,7 @@ function pip_dummy(pct)
 		return
 	end
 	window_mini(1, 2)
-	mp.msg.info("pip_dummy 已尝试应用")
+	mp.msg.info("pip_dummy attempted to apply")
 end
 
 
@@ -623,11 +624,11 @@ function show_playlist_shuffle()
 end
 function playlist_order(mode, re)
 	if shuffling then
-		mp.msg.info("playlist_order 已阻止高频洗牌")
+		mp.msg.info("playlist_order blocked rapid shuffling")
 		return
 	end
 	if mp.get_property_number("playlist-count") <= 2 then
-		mp.osd_message("[input_plus] " .. "播放列表中的条目数量不足", 1)
+		mp.osd_message("[input_plus] " .. "Not enough items in playlist", 1)
 		return
 	end
 	shuffling = true
@@ -670,7 +671,7 @@ function playlist_random()
 	local pos = mp.get_property_number("playlist-pos-1", 0)
 	local pos_nxt = math.random(1, range)
 	if range <=2 then
-		mp.msg.info("playlist_random 播放列表的条目数量未超过2")
+		mp.msg.info("playlist_random Playlist item count is not greater than 2")
 		return
 	else
 		while pos_nxt == pos do
@@ -682,7 +683,7 @@ end
 function playlist_tmp_save()
 	local item_num = mp.get_property_number("playlist-count", 0)
 	if item_num == 0 then
-		mp.osd_message("[input_plus] " .. "播放列表中无文件", 1)
+		mp.osd_message("[input_plus] " .. "No files in playlist", 1)
 		return
 	end
 	local file, err = io.open(save_path, "w")
@@ -693,14 +694,14 @@ function playlist_tmp_save()
 		file:write(save_item, "\n")
 		Nn = Nn+1
 	end
-	mp.osd_message("[input_plus] " .. "已保存至临时播放列表", 1)
-	mp.msg.info("playlist_tmp_save 主设置文件夹/playlist_temp.mpl")
+	mp.osd_message("[input_plus] " .. "Saved to temporary playlist", 1)
+	mp.msg.info("playlist_tmp_save main config folder/playlist_temp.mpl")
 	file:close()
 end
 function playlist_tmp_load()
 	mp.commandv("loadlist", save_path, "replace")
 	if mp.get_property_number("playlist-count", 0) == 0 then
-		mp.osd_message("[input_plus] " .. "临时播放列表加载失败", 1)
+		mp.osd_message("[input_plus] " .. "Failed to load temporary playlist", 1)
 	else
 		mp.osd_message(mp.command_native({"expand-text", "${playlist}"}), 2)
 	end
@@ -711,11 +712,11 @@ function quit_real()
 	if pre_quit then
 		mp.command("quit")
 	else
-		mp.osd_message("再次执行以确认退出", 1.5)
+		mp.osd_message("Run again to confirm exit", 1.5)
 		pre_quit = true
 		mp.add_timeout(1.5, function()
 			pre_quit = false
-			mp.msg.verbose("quit_real 检测到误触退出键")
+			mp.msg.verbose("quit_real Detected accidental quit key press")
 		end)
 	end
 end
@@ -725,12 +726,12 @@ function quit_wait()
 		return
 	else
 		pre_quit = true
-		mp.osd_message("即将退出，再次执行以取消", 3)
+		mp.osd_message("About to quit. Run again to cancel", 3)
 		mp.add_timeout(3, function()
 			if pre_quit then
 				mp.command("quit")
 			else
-				mp.osd_message("已取消退出", 0.5)
+				mp.osd_message("Quit cancelled", 0.5)
 				return
 			end
 		end)
@@ -785,10 +786,10 @@ function speed_auto(num, any)
 		local evt = flag_complex.event
 		if evt == "down" then
 			mp.set_property_number("speed", num)
-			mp.msg.verbose("speed_auto 变速播放中")
+			mp.msg.verbose("speed_auto adaptive speed playback active")
 		elseif evt == "up" then
 			mp.set_property_number("speed", 1)
-			mp.msg.verbose("speed_auto 已恢复常速")
+			mp.msg.verbose("speed_auto restored normal speed")
 		end
 	end
 	return speed_auto_sub
@@ -811,10 +812,10 @@ function speed_scale(rat, fact)
 		spd_scale = rat * i / math.floor(i * rat + 0.5)
 		spd_delta = math.abs(spd_scale - 1)
 		if spd_delta < spd_delta_min then
-			mp.msg.info("speed_sync_toggle 目标速度为1")
+			mp.msg.info("speed_sync_toggle target speed is 1")
 			return 1
 		elseif spd_delta <= spd_delta_max then
-			mp.msg.info("speed_sync_toggle 目标速度为" .. spd_scale)
+			mp.msg.info("speed_sync_toggle target speed is " .. spd_scale)
 			return spd_scale
 		end
 	end
@@ -825,7 +826,7 @@ function speed_adaptive()
 	local fps_dp = mp.get_property_number("display-fps", 0)
 	local spd_cur = mp.get_property_number("speed", 1)
 	if (fps_raw == 0 or fps_dp == 0 or fps_raw > 32 or math.abs(fps_vf - fps_raw) > 0.5) then
-		mp.msg.warn("speed_sync_toggle 存在例外的FPS情况")
+		mp.msg.warn("speed_sync_toggle special FPS case exists")
 		return
 	end
 	for i = 1, spd_iters_max do
@@ -835,7 +836,7 @@ function speed_adaptive()
 				break
 			else
 				mp.set_property("speed", spd_target)
-				mp.msg.info("speed_sync_toggle 设定当前速度为" .. spd_target)
+				mp.msg.info("speed_sync_toggle set current speed to " .. spd_target)
 				break
 			end
 		end
@@ -845,12 +846,12 @@ function speed_sync_toggle()
 	spd_adapt = not spd_adapt
 	if spd_adapt then
 		speed_adaptive()
-		mp.osd_message("[input_plus] " .. "已启用速度自适应", 1)
+		mp.osd_message("[input_plus] " .. "Speed adaptation enabled", 1)
 		mp.register_event("playback-restart", speed_adaptive)
 	else
 		mp.unregister_event(speed_adaptive)
 		mp.set_property_number("speed", 1)
-		mp.osd_message("[input_plus] " .. "已禁用速度自适应", 1)
+		mp.osd_message("[input_plus] " .. "Speed adaptation disabled", 1)
 		return
 	end
 end
@@ -879,7 +880,7 @@ function track_seek(id, num)
 	if mp.get_property_number(id, 0) == 0 then
 		mp.command("add " .. id .. " " .. num)
 		if mp.get_property_number(id, 0) == 0 then
-			mp.osd_message("[input_plus] " .. "无可用" .. id, 1)
+			mp.osd_message("[input_plus] " .. "No available " .. id, 1)
 		end
 	end
 end
@@ -888,7 +889,7 @@ end
 function track_refresh(id)
 	local current_id = mp.get_property_number(id, 0)
 	if current_id == 0 then
-		mp.msg.warn("track_refresh 当前" .. id .. "无效")
+		mp.msg.warn("track_refresh 当前" .. id .. "invalid")
 		return
 	end
 	mp.set_property_number(id, 0)
@@ -913,7 +914,7 @@ function volume_add(diff)
 		gain = volume2db(10)
 	end
 	mp.set_property_number("volume", db2volume(gain))
-	mp.osd_message("[input_plus] " .. string.format("音量增益： %+.2f dB", gain))
+	mp.osd_message("[input_plus] " .. string.format("Volume gain: %+.2f dB", gain))
 end
 
 
@@ -923,10 +924,10 @@ function prop_hold(prop)
 		if evt == "down" then
 			prop_tmp = mp.get_property_native(prop, "")
 			mp.set_property_native(prop, "")
-			mp.msg.verbose("prop_hold 已清零 " .. prop)
+			mp.msg.verbose("prop_hold cleared " .. prop)
 		elseif evt == "up" then
 			mp.set_property_native(prop, prop_tmp)
-			mp.msg.verbose("prop_hold 已恢复")
+			mp.msg.verbose("prop_hold resumed")
 		end
 	end
 	return prop_auto
@@ -985,7 +986,7 @@ end
 
 function update_var(var, val)
 	local msg_info_pre = "[input_plus] "
-	local msg_info = "内部变量更新"
+	local msg_info = "Internal variable updated"
 
 	if var == "spd_target" then
 		mp.remove_key_binding("speed_autox")
@@ -993,7 +994,7 @@ function update_var(var, val)
 			val = 0.1
 		end
 		spd_target = tonumber(val)
-		msg_info = "自定义目标速度 " .. val
+		msg_info = "Custom target speed " .. val
 		mp.osd_message(msg_info_pre .. msg_info, 1)
 		mp.msg.info(msg_info)
 		mp.add_key_binding(nil, "speed_autox", speed_auto(nil, spd_target), {complex = true})
@@ -1003,7 +1004,7 @@ function update_var(var, val)
 			val = 0.1
 		end
 		seek_dur_step = tonumber(val)
-		msg_info = "自定义跳转步长增量 " .. val
+		msg_info = "Custom seek step increment " .. val
 		mp.osd_message(msg_info_pre .. msg_info, 1)
 		mp.msg.info(msg_info)
 
